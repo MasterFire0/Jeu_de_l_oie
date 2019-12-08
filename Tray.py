@@ -42,9 +42,13 @@ class Tray:
     player_turn = 0
     players_grid = [0, 0, 0, 0]
 
-    player1_possible_position = ((60, 25), (134, 25), (208, 25), (282, 25), (356, 25), (430, 25), (504, 25), (578, 25), (654, 25),
-                                 (654, 98), (654, 170),
-                                 (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0))
+    player1_possible_position = ((60, 25), (134, 25), (208, 25), (282, 25), (356, 25), (430, 25), (504, 25), (578, 25), (653, 25),
+                                 (653, 98), (653, 175),
+                                 (578, 175), (504, 175), (430, 175), (356, 175), (282, 175), (208, 175), (134, 175), (60, 175),
+                                 (60, 245), (60, 315),
+                                 (134, 315), (208, 315), (282, 315), (356, 315), (430, 315), (504, 315), (578, 315), (653, 315),
+                                 (653, 392), (653, 465),
+                                 (578, 465), (504, 465), (430, 465), (356, 465), (282, 465), (208, 465), (134, 465), (60, 465))
 
     window = None
 
@@ -94,10 +98,10 @@ class Tray:
 
     def forward_player(self, to_forward, player_turn):
         print(to_forward)
-        for i in range(0, self.player_count):
-            if i == player_turn and player_turn == 0:
-                self.players[i].move(self.player1_possible_position[9 + self.players_grid[i]])
-                self.players_grid[i] += to_forward
+        # for i in range(0, self.player_count):
+        #    if i == player_turn and player_turn == 0:
+        self.players[0].move(self.player1_possible_position[0 + self.players_grid[0]])
+        self.players_grid[0] += 1
 
     def animate_launch_dices(self, dice1_number, dice2_number):
         wait_time = 0.1
