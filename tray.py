@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 import time
 import random
-from Goose import Goose
+from goose import Goose
 
 
 class Tray:

@@ -1,4 +1,4 @@
-from Tray import Tray
+from tray import Tray
 import pygame
 from pygame.locals import *
 
