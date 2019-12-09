@@ -8,7 +8,6 @@ clock = pygame.time.Clock()
 
 def main():
 
-    """
     while True:
         player_count = input("Combien de joueurs participent ? (2-3-4)\n")
         if player_count == "2" or player_count == "3" or player_count == "4":
@@ -16,8 +15,6 @@ def main():
         else:
             print("Entrée incorrect")
             continue
-    """
-    player_count = 4
 
     tray = Tray("assets/tray.png", 720, 540, int(player_count))
     tray.create_window()
