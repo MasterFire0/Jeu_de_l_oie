@@ -3,6 +3,7 @@ from pygame.locals import *
 import time
 import random
 from goose import Goose
+from constants import *
 
 
 class Tray:
@@ -11,14 +12,7 @@ class Tray:
     WIDTH = 0
     background = None
 
-    # Dice faces src
-    dice_face1_src = "assets/dice_faces/face1.png"
-    dice_face2_src = "assets/dice_faces/face2.png"
-    dice_face3_src = "assets/dice_faces/face3.png"
-    dice_face4_src = "assets/dice_faces/face4.png"
-    dice_face5_src = "assets/dice_faces/face5.png"
-    dice_face6_src = "assets/dice_faces/face6.png"
-
+    # Dice faces
     dice_face1 = None
     dice_face2 = None
     dice_face3 = None
@@ -30,25 +24,12 @@ class Tray:
 
     dices_pos = ((322, 243), (398, 243))
 
-    # Grid
-
     # All player stuff
     players_sprite = pygame.sprite.Group()
     players = []
     player_count = 0
-    players_start_positions = ((60, 25), (60, 55), (30, 25), (30, 55))
-    players_colors = ((0, 0, 0), (255, 0, 0), (0, 82, 0), (0, 0, 85))
-    player_radius = 13
     player_turn = 0
-    players_grid = [0, 0, 0, 0]
-
-    player1_possible_position = ((60, 25), (134, 25), (208, 25), (282, 25), (356, 25), (430, 25), (504, 25), (578, 25), (653, 25),
-                                 (653, 98), (653, 175),
-                                 (578, 175), (504, 175), (430, 175), (356, 175), (282, 175), (208, 175), (134, 175), (60, 175),
-                                 (60, 245), (60, 315),
-                                 (134, 315), (208, 315), (282, 315), (356, 315), (430, 315), (504, 315), (578, 315), (653, 315),
-                                 (653, 392), (653, 465),
-                                 (578, 465), (504, 465), (430, 465), (356, 465), (282, 465), (208, 465), (134, 465), (60, 465))
+    players_grid = [1, 1, 1, 1]
 
     window = None
 
@@ -68,19 +49,19 @@ class Tray:
         self.init_dices()
 
     def init_dices(self):
-        self.dice_face1 = pygame.image.load(self.dice_face1_src).convert_alpha()
-        self.dice_face2 = pygame.image.load(self.dice_face2_src).convert_alpha()
-        self.dice_face3 = pygame.image.load(self.dice_face3_src).convert_alpha()
-        self.dice_face4 = pygame.image.load(self.dice_face4_src).convert_alpha()
-        self.dice_face5 = pygame.image.load(self.dice_face5_src).convert_alpha()
-        self.dice_face6 = pygame.image.load(self.dice_face6_src).convert_alpha()
+        self.dice_face1 = pygame.image.load(dice_face1_src).convert_alpha()
+        self.dice_face2 = pygame.image.load(dice_face2_src).convert_alpha()
+        self.dice_face3 = pygame.image.load(dice_face3_src).convert_alpha()
+        self.dice_face4 = pygame.image.load(dice_face4_src).convert_alpha()
+        self.dice_face5 = pygame.image.load(dice_face5_src).convert_alpha()
+        self.dice_face6 = pygame.image.load(dice_face6_src).convert_alpha()
 
         self.dice_faces = (
             self.dice_face1, self.dice_face2, self.dice_face3, self.dice_face4, self.dice_face5, self.dice_face6)
 
     def init_players(self):
         for k in range(0, self.player_count):
-            goose = Goose(self.players_colors[k], self.players_start_positions[k])
+            goose = Goose(players_colors[k], players_start_positions[k])
             self.players_sprite.add(goose)
             self.players.append(goose)
             self.players[k].init_sprite_positions()
@@ -89,19 +70,18 @@ class Tray:
         dice1_number = random.randint(1, 6)
         dice2_number = random.randint(1, 6)
         to_forward = dice1_number + dice2_number
-        # self.animate_launch_dices(dice1_number, dice2_number)
+        self.animate_launch_dices(dice1_number, dice2_number)
         self.forward_player(to_forward, self.player_turn)
-        if self.player_turn >= 4:
+        if self.player_turn >= 3:
             self.player_turn = 0
         else:
             self.player_turn += 1
 
     def forward_player(self, to_forward, player_turn):
-        print(to_forward)
-        # for i in range(0, self.player_count):
-        #    if i == player_turn and player_turn == 0:
-        self.players[0].move(self.player1_possible_position[0 + self.players_grid[0]])
-        self.players_grid[0] += 1
+        for i in range(0, self.player_count):
+            if i == player_turn:
+                self.players[i].move(players_possibles_positions[i][to_forward + self.players_grid[i]])
+                self.players_grid[i] += to_forward
 
     def animate_launch_dices(self, dice1_number, dice2_number):
         wait_time = 0.1
