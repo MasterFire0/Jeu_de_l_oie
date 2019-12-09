@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
-import time
 import random
+import time
 from goose import Goose
 from constants import *
 
@@ -34,11 +34,33 @@ class Tray:
     window = None
 
     def __init__(self, background_image_src, width, height, player_count):
+        self.run = True
         self.HEIGHT = width
         self.WIDTH = height
         self.background_image_src = background_image_src
         self.player_count = player_count
+        self.first_space = True
+        self.fast_dice_animation = False
         pygame.init()
+        self.create_window()
+
+    def update(self):
+        self.check_pygame_events()
+        self.draw_players()
+
+    def check_pygame_events(self):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                self.run = False
+                pass
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    if self.first_space:
+                        self.first_space = False
+                        self.fast_dice_animation = False
+                        self.launch_dices()
+                    else:
+                        self.fast_dice_animation = True
 
     def create_window(self):
         self.window = pygame.display.set_mode((self.HEIGHT, self.WIDTH))
@@ -46,6 +68,7 @@ class Tray:
         self.background = pygame.image.load(self.background_image_src).convert_alpha()
         self.window.blit(self.background, (0, 0))
         pygame.display.flip()
+        self.init_players()
         self.init_dices()
 
     def init_dices(self):
@@ -85,27 +108,33 @@ class Tray:
 
     def animate_launch_dices(self, dice1_number, dice2_number):
         wait_time = 0.1
-        for k in range(0, 3):
+        for k in range(0, 4):
             for i in range(0, 6):
+                if self.fast_dice_animation:
+                    self.window.blit(self.dice_faces[dice1_number - 1], self.dices_pos[0])
+                    self.window.blit(self.dice_faces[dice2_number - 1], self.dices_pos[1])
+                    pygame.display.flip()
+                    break
                 dice1 = self.dice_faces[i]
                 dice2 = self.dice_faces[i]
-                self.window.blit(dice1, self.dices_pos[0])
-                self.window.blit(dice2, self.dices_pos[1])
+                if k == 3:
+                    if i <= dice1_number:
+                        self.window.blit(dice1, self.dices_pos[0])
+                    if i <= dice2_number:
+                        self.window.blit(dice2, self.dices_pos[1])
+                else:
+                    self.window.blit(dice1, self.dices_pos[0])
+                    self.window.blit(dice2, self.dices_pos[1])
                 pygame.display.flip()
+                self.check_pygame_events()
                 time.sleep(wait_time)
                 pass
+            if self.fast_dice_animation:
+                self.fast_dice_animation = False
+                break
             pass
-
-        for i in range(0, 6):
-            dice1 = self.dice_faces[i]
-            dice2 = self.dice_faces[i]
-            if i <= dice1_number:
-                self.window.blit(dice1, self.dices_pos[0])
-            if i <= dice2_number:
-                self.window.blit(dice2, self.dices_pos[1])
-            pygame.display.flip()
-            time.sleep(wait_time)
         time.sleep(1.5)
+        self.first_space = True
 
     def draw_players(self):
         self.players_sprite.update()
