@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 import random
 import time
 from goose import Goose
@@ -31,8 +30,6 @@ class Tray:
     players = []
     player_count = 0
     player_turn = 0
-    players_grid = [1, 1, 1, 1]
-    player_trap_state = [0, 0, 0, 0]
 
     trap_grids = ((4, 0), (8, 1), (10, 2), (15, 0), (19, 2), (23, 1), (25, 3), (29, 2), (33, 4), (35, 0), (37, 5))
     win_grid = 39
@@ -50,6 +47,7 @@ class Tray:
         self.is_keyboard_deactivate = False
         pygame.init()
         self.font = pygame.font.Font(None, 40)
+        self.default_font = pygame.font.Font(None, 40)
         self.text_to_render = None
         self.create_window()
 
@@ -103,11 +101,11 @@ class Tray:
             self.players[k].init_sprite_positions()
 
     def launch_dices(self):
-        if self.player_trap_state[self.player_turn] == 1:
+        if self.players[self.player_turn].is_trapped() == 1:
             self.text_to_render = self.font.render(
                 "Le joueur " + str((self.player_turn + 1)) + " est bloqué et doit attendre.", 1, BLACK)
             time.sleep(1.2)
-            return
+            print("end sleep")
         else:
             dice1_number = random.randint(1, 6)
             # dice2_number = random.randint(1, 6)
@@ -118,36 +116,37 @@ class Tray:
             self.player_turn = 0
         else:
             self.player_turn += 1
+        print("lauch dice end")
 
     def forward_player(self, to_forward, player_turn):
         self.text_to_render = self.font.render(
             "Le joueur " + str((player_turn + 1)) + " avance de " + str(to_forward) + " case(s)", 1, BLACK)
         for k in range(to_forward):
-            self.players[player_turn].move(players_possibles_positions[player_turn][k + self.players_grid[player_turn]])
+            self.players[player_turn].move(players_possibles_positions[player_turn][k + self.players[player_turn].get_grid()])
             time.sleep(0.3)
             self.update()
-        self.players_grid[player_turn] += to_forward
+        self.players[player_turn].add_grid(to_forward)
         for k in self.trap_grids:
-            if k[0] == self.players_grid[player_turn]:
+            if k[0] == self.players[player_turn].get_grid():
                 if k[1] == 3 or k[1] == 5:
                     for j in range(self.player_count):
-                        if self.player_trap_state[j] == 1 and self.players_grid[j] == self.players_grid[player_turn]:
-                            self.player_trap_state[j] = 0
-                            self.player_trap_state[player_turn] = 1
-                    return
+                        if self.players[j].is_trapped() == 1 and self.players[j].is_trapped() == self.players[j].is_trapped():
+                            print("effectively trap")
+                            self.players[player_turn].set_trap(0)
+                        self.trap_player(k[1], player_turn, to_forward)
                 else:
                     self.trap_player(k[1], player_turn, to_forward)
         self.is_keyboard_deactivate = False
 
     def backward_player(self, to_backward, player_turn):
         self.text_to_render = self.font.render(
-            "Le joueur " + str((player_turn + 1)) + " recule de " + str(to_backward) + " case(s)", 1, BLACK)
+            "Malus: Le joueur " + str((player_turn + 1)) + " recule de " + str(to_backward) + " case(s)", 1, BLACK)
         time.sleep(0.4)
         for k in range(to_backward):
-            self.players[player_turn].move(players_possibles_positions[player_turn][-k + (self.players_grid[player_turn] - 2)])
+            self.players[player_turn].move(players_possibles_positions[player_turn][-k + (self.players[player_turn].get_grid() - 2)])
             time.sleep(0.3)
             self.update()
-        self.players_grid[player_turn] -= to_backward
+        self.players[player_turn] -= to_backward
         self.is_keyboard_deactivate = False
 
     def trap_player(self, trap, player_turn, previous_forward):
@@ -163,7 +162,11 @@ class Tray:
             self.forward_player(previous_forward, player_turn)
             pass
         elif trap == 3:
-            self.player_trap_state[player_turn] = 1
+            self.players[player_turn].set_trap(1)
+            self.font = pygame.font.Font(None, 33)
+            self.text_to_render = self.font.render(
+                "Le joueur " + str((player_turn + 1)) + " est tombé dans le puit. Il est bloqué.", 1, BLACK)
+            self.update()
             time.sleep(0.4)
             self.is_keyboard_deactivate = False
             pass
@@ -171,17 +174,24 @@ class Tray:
             time.sleep(0.4)
             self.players[player_turn].move(players_possibles_positions[player_turn][12])
             self.update()
+            self.text_to_render = self.font.render(
+                "Le joueur " + str((player_turn + 1)) + " est dans le labyrinthe. Il retourne à la case 11.", 1, BLACK)
+            self.update()
             self.is_keyboard_deactivate = False
             pass
         elif trap == 5:
-            self.player_trap_state[player_turn] = 1
+            self.players[player_turn].set_trap(1)
             time.sleep(0.4)
+            self.text_to_render = self.font.render(
+                "Le joueur " + str((player_turn + 1)) + " est en prison. Il est bloqué.", 1, BLACK)
+            self.update()
             self.is_keyboard_deactivate = False
             pass
 
     def animate_launch_dices(self, dice1_number, dice2_number=None):
         wait_time = 0.1
         self.text_to_render = None
+        self.font = self.default_font
         self.update()
         for k in range(0, 4):
             for i in range(0, 6):

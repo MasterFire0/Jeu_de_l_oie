@@ -1,6 +1,7 @@
 from tray import Tray
 import pygame
 
+
 def main():
     """
     while True:
