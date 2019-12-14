@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 
 
 class Goose(pygame.sprite.Sprite):
@@ -10,6 +9,8 @@ class Goose(pygame.sprite.Sprite):
         super().__init__()
 
         self.start_positions = start_positions
+        self.is_trapped = False
+        self.grid = 1
 
         self.image = pygame.Surface([width, height])
         self.image.fill((255, 255, 255))
@@ -29,3 +30,21 @@ class Goose(pygame.sprite.Sprite):
     def update(self):
         self.rect.x = self.x
         self.rect.y = self.y
+
+    def is_trapped(self):
+        return self.is_trapped
+
+    def set_trap(self, state):
+        self.is_trapped = state
+
+    def get_grid(self):
+        return self.grid
+
+    def set_grid(self, grid):
+        self.grid = grid
+
+    def add_grid(self, grid):
+        self.grid += grid
+
+    def remove_grid(self, grid):
+        self.grid -= grid
