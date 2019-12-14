@@ -9,7 +9,7 @@ class Goose(pygame.sprite.Sprite):
         super().__init__()
 
         self.start_positions = start_positions
-        self.is_trapped = False
+        self.player_trapped = False
         self.grid = 1
 
         self.image = pygame.Surface([width, height])
@@ -32,10 +32,10 @@ class Goose(pygame.sprite.Sprite):
         self.rect.y = self.y
 
     def is_trapped(self):
-        return self.is_trapped
+        return self.player_trapped
 
     def set_trap(self, state):
-        self.is_trapped = state
+        self.player_trapped = state
 
     def get_grid(self):
         return self.grid
