@@ -2,8 +2,8 @@ import pygame
 from pygame.locals import *
 import random
 import time
-from goose import Goose
-from constants import *
+from classes.goose import Goose
+from imports.constants import *
 
 BLACK = (0, 0, 0)
 
@@ -105,8 +105,8 @@ class Tray:
         if self.players[self.player_turn].is_trapped():
             self.text_to_render = self.font.render(
                 "Le joueur " + str((self.player_turn + 1)) + " est bloqué et doit attendre.", 1, BLACK)
+            self.first_space = True
             self.update()
-            time.sleep(1.2)
         else:
             dice1_number = random.randint(1, 6)
             # dice2_number = random.randint(1, 6)
@@ -122,27 +122,32 @@ class Tray:
         self.text_to_render = self.font.render(
             "Le joueur " + str((player_turn + 1)) + " avance de " + str(to_forward) + " case(s)", 1, BLACK)
         for k in range(to_forward):
-            self.players[player_turn].move(players_possibles_positions[player_turn][k + self.players[player_turn].get_grid()])
+            self.players[player_turn].move(
+                players_possibles_positions[player_turn][k + self.players[player_turn].get_grid()])
             time.sleep(0.3)
             self.update()
         self.players[player_turn].add_grid(to_forward)
+        self.detect_trap(self.players[player_turn].get_grid(), player_turn, to_forward)
+        self.is_keyboard_deactivate = False
+
+    def detect_trap(self, player_grid, player_turn, to_forward):
         for k in self.trap_grids:
-            if k[0] == self.players[player_turn].get_grid():
+            if k[0] == player_grid:
                 if k[1] == 3 or k[1] == 5:
-                    for j in range(self.player_count):
-                        if self.players[j].is_trapped() and self.players[j].get_grid() == self.players[player_turn].get_grid():
-                            self.players[player_turn].set_trap(False)
+                    for player in self.players:
+                        if player.is_trapped() and player.get_grid() == player_grid and not player == self.players[player_turn]:
+                            player.set_trap(False)
                         self.trap_player(k[1], player_turn, to_forward)
                 else:
                     self.trap_player(k[1], player_turn, to_forward)
-        self.is_keyboard_deactivate = False
 
     def backward_player(self, to_backward, player_turn):
         self.text_to_render = self.font.render(
             "Malus: Le joueur " + str((player_turn + 1)) + " recule de " + str(to_backward) + " case(s)", 1, BLACK)
         time.sleep(0.4)
         for k in range(to_backward):
-            self.players[player_turn].move(players_possibles_positions[player_turn][-k + (self.players[player_turn].get_grid() - 2)])
+            self.players[player_turn].move(
+                players_possibles_positions[player_turn][-k + (self.players[player_turn].get_grid() - 2)])
             time.sleep(0.3)
             self.update()
         self.players[player_turn].remove_grid(to_backward)

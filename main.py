@@ -1,4 +1,4 @@
-from tray import Tray
+from classes.tray import Tray
 import pygame
 
 
