@@ -5,12 +5,13 @@ class Goose(pygame.sprite.Sprite):
     start_positions = [0, 0]
     x, y = 0, 0
 
-    def __init__(self, color, start_positions, width=22, height=22):
+    def __init__(self, color, start_positions, player_id, width=22, height=22):
         super().__init__()
 
         self.start_positions = start_positions
         self.player_trapped = False
         self.grid = 1
+        self.player_id = player_id
 
         self.image = pygame.Surface([width, height])
         self.image.fill((255, 255, 255))
@@ -18,6 +19,9 @@ class Goose(pygame.sprite.Sprite):
 
         pygame.draw.rect(self.image, color, [0, 0, width, height])
         self.rect = self.image.get_rect()
+
+    def get_id(self):
+        return self.player_id
 
     def init_sprite_positions(self):
         self.x = self.start_positions[0]

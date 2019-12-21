@@ -75,12 +75,12 @@ class Tray:
 
     def create_window(self):
         self.window = pygame.display.set_mode((self.HEIGHT, self.WIDTH))
-        pygame.display.set_caption("Jeu de l'oie")
+        pygame.display.set_caption("Jeu de l’oie")
         self.background = pygame.image.load(self.background_image_src).convert_alpha()
         self.window.blit(self.background, (0, 0))
         self.init_players()
         self.init_dices()
-        self.text_to_render = self.font.render("Appuiez sur espace pour lancer le dé.", 1, BLACK)
+        self.text_to_render = self.font.render("Appuyez sur espace pour lancer le dé.", 1, BLACK)
         pygame.display.flip()
 
     def init_dices(self):
@@ -96,7 +96,7 @@ class Tray:
 
     def init_players(self):
         for k in range(0, self.player_count):
-            goose = Goose(players_colors[k], players_start_positions[k])
+            goose = Goose(players_colors[k], players_start_positions[k], k)
             self.players_sprite.add(goose)
             self.players.append(goose)
             self.players[k].init_sprite_positions()
@@ -122,6 +122,8 @@ class Tray:
         self.text_to_render = self.font.render(
             "Le joueur " + str((player_turn + 1)) + " avance de " + str(to_forward) + " case(s)", 1, BLACK)
         for k in range(to_forward):
+            if self.check_win(self.players[player_turn], to_forward - k):
+                return
             self.players[player_turn].move(
                 players_possibles_positions[player_turn][k + self.players[player_turn].get_grid()])
             time.sleep(0.3)
@@ -152,6 +154,17 @@ class Tray:
             self.update()
         self.players[player_turn].remove_grid(to_backward)
         self.is_keyboard_deactivate = False
+
+    def check_win(self, player, to_go):
+        print("check " + to_go)
+        if player.get_grid() == self.win_grid:
+            if to_go == 0:
+                self.text_to_render = self.font.render("Félicitation, le joueur " + player.get_id() + " gagne !")
+                self.update()
+                self.run = False
+            else:
+                self.backward_player(to_go, player.get_id())
+            return True
 
     def trap_player(self, trap, player_turn, previous_forward):
         if trap == 0:
