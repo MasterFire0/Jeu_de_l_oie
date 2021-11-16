@@ -156,7 +156,6 @@ class Tray:
         self.is_keyboard_deactivate = False
 
     def check_win(self, player, to_go):
-        print("check " + to_go)
         if player.get_grid() == self.win_grid:
             if to_go == 0:
                 self.text_to_render = self.font.render("Félicitation, le joueur " + player.get_id() + " gagne !")
